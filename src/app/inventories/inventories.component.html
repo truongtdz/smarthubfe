@@ -1,0 +1,173 @@
+<div class="container-fluid py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="bi bi-box-seam me-2"></i>Quản lý tồn kho sản phẩm
+      </h4>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Search -->
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              class="form-control"
+              placeholder="Tìm theo tên, mô tả, ID..."
+              [(ngModel)]="searchKeyword"
+              (keyup.enter)="search()">
+            <button class="btn btn-primary" (click)="search()">Tìm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-primary">
+          <tr>
+            <th style="width: 80px;">ID</th>
+            <th style="width: 100px;">Ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th style="width: 150px;">Danh mục</th>
+            <th style="width: 150px;" class="text-center">Tồn kho</th>
+            <th style="width: 120px;" class="text-center">Thao tác</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr *ngFor="let p of products">
+            <td>{{p.id}}</td>
+
+            <td>
+              <img *ngIf="p.imageUrl"
+                   [src]="p.imageUrl"
+                   alt="{{p.name}}"
+                   class="img-thumbnail"
+                   style="width: 60px; height: 60px; object-fit: cover;">
+              <div *ngIf="!p.imageUrl"
+                   class="d-flex align-items-center justify-content-center bg-light rounded"
+                   style="width: 60px; height: 60px;">
+                <i class="bi bi-image text-muted fs-4"></i>
+              </div>
+            </td>
+
+            <td>
+              <strong>{{p.name}}</strong>
+              <div class="text-muted small" *ngIf="p.description">
+                {{p.description}}
+              </div>
+            </td>
+
+            <td>
+              <span class="badge bg-info">
+                {{getCategoryName(p.categoryId)}}
+              </span>
+            </td>
+
+            <td class="text-center">
+              <span class="badge fs-6 px-3 py-2"
+                    [ngClass]="getStockBadgeClass(p.stock)">
+                {{p.stock || 0}} sản phẩm
+              </span>
+              <div class="small text-muted mt-1" *ngIf="!p.stock || p.stock === 0">
+                Hết hàng
+              </div>
+              <div class="small text-warning mt-1" *ngIf="p.stock && p.stock < 10 && p.stock > 0">
+                Sắp hết
+              </div>
+            </td>
+
+            <td class="text-center">
+              <button class="btn btn-sm btn-info"
+                      (click)="openStockModal(p)"
+                      title="Cập nhật tồn kho">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="products.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              Không có sản phẩm
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- UPDATE STOCK MODAL -->
+<div class="modal fade" id="stockModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-box-seam me-2"></i>
+          Cập nhật tồn kho
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="text-center mb-3" *ngIf="currentProduct">
+          <img *ngIf="currentProduct.imageUrl"
+               [src]="currentProduct.imageUrl"
+               alt="{{currentProduct.name}}"
+               class="img-thumbnail mb-2"
+               style="width: 100px; height: 100px; object-fit: cover;">
+          <h6 class="mb-1">{{currentProduct.name}}</h6>
+          <small class="text-muted">ID: {{currentProduct.id}}</small>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">
+            Số lượng hiện tại:
+            <span [ngClass]="getStockBadgeClass(currentProduct?.stock)"
+                  class="badge ms-2">
+              {{currentProduct?.stock || 0}}
+            </span>
+          </label>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Số lượng mới *</label>
+          <input type="number"
+                 class="form-control form-control-lg"
+                 [(ngModel)]="newStock"
+                 min="0"
+                 placeholder="Nhập số lượng tồn kho">
+          <small class="text-muted">Nhập số lượng sản phẩm còn lại trong kho</small>
+        </div>
+
+        <div class="alert alert-warning" *ngIf="newStock < 10 && newStock > 0">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Cảnh báo: Số lượng tồn kho thấp!
+        </div>
+
+        <div class="alert alert-danger" *ngIf="newStock === 0">
+          <i class="bi bi-x-circle me-2"></i>
+          Sản phẩm sẽ hiển thị trạng thái "Hết hàng"
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-primary" (click)="updateStock()">
+          <i class="bi bi-check-circle me-1"></i>
+          Cập nhật
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

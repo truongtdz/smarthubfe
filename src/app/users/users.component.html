@@ -1,0 +1,206 @@
+<div class="container-fluid py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Quản lý người dùng</h4>
+    </div>
+
+    <div class="card-body">
+      <!-- Search and Add Section -->
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Tìm kiếm theo email, tên, vai trò..."
+              [(ngModel)]="searchKeyword"
+              (keyup.enter)="searchUsers()">
+            <button class="btn btn-primary" type="button" (click)="searchUsers()">
+              Tìm kiếm
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-success" (click)="openAddModal()">
+            <i class="bi bi-plus-circle me-2"></i>Thêm người dùng
+          </button>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-primary">
+          <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Họ tên</th>
+            <th>Vai trò</th>
+            <th class="text-center">Thao tác</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.fullName }}</td>
+            <td>
+                <span class="badge" [ngClass]="{
+                  'bg-danger': user.role === 'ADMIN',
+                  'bg-primary': user.role === 'USER',
+                  'bg-warning': user.role === 'MODERATOR'
+                }">
+                  {{ user.role }}
+                </span>
+            </td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-info me-2" (click)="openEditModal(user)" title="Sửa">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="openDeleteModal(user)" title="Xóa">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              Không có dữ liệu
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi me-2" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+          {{ isEditMode ? 'Sửa người dùng' : 'Thêm người dùng' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form #userFormRef="ngForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="currentUser.email"
+              name="email"
+              #email="ngModel"
+              required
+              email
+              [class.is-invalid]="email.invalid && email.touched"
+              placeholder="Nhập email">
+            <div class="invalid-feedback" *ngIf="email.invalid && email.touched">
+              <span *ngIf="email.errors?.['required']">Email là bắt buộc</span>
+              <span *ngIf="email.errors?.['email']">Email không hợp lệ</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Mật khẩu <span class="text-danger">*</span></label>
+            <input
+              type="password"
+              class="form-control"
+              [(ngModel)]="currentUser.password"
+              name="password"
+              #password="ngModel"
+              required
+              minlength="6"
+              [class.is-invalid]="password.invalid && password.touched"
+              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)">
+            <div class="invalid-feedback" *ngIf="password.invalid && password.touched">
+              <span *ngIf="password.errors?.['required']">Mật khẩu là bắt buộc</span>
+              <span *ngIf="password.errors?.['minlength']">Mật khẩu tối thiểu 6 ký tự</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Họ tên <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="currentUser.fullName"
+              name="fullName"
+              #fullName="ngModel"
+              required
+              minlength="2"
+              [class.is-invalid]="fullName.invalid && fullName.touched"
+              placeholder="Nhập họ tên">
+            <div class="invalid-feedback" *ngIf="fullName.invalid && fullName.touched">
+              <span *ngIf="fullName.errors?.['required']">Họ tên là bắt buộc</span>
+              <span *ngIf="fullName.errors?.['minlength']">Họ tên tối thiểu 2 ký tự</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Vai trò <span class="text-danger">*</span></label>
+            <select
+              class="form-select"
+              [(ngModel)]="currentUser.role"
+              name="role"
+              #role="ngModel"
+              required
+              [class.is-invalid]="role.invalid && role.touched">
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="role.invalid && role.touched">
+              <span *ngIf="role.errors?.['required']">Vai trò là bắt buộc</span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-2"></i>Hủy
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveUser()">
+          <i class="bi bi-check-circle me-2"></i>{{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <i class="bi bi-trash fs-1 text-danger mb-3 d-block"></i>
+        <p class="fs-5">Bạn có chắc chắn muốn xóa người dùng này?</p>
+        <div class="alert alert-warning" *ngIf="userToDelete">
+          <strong>Email:</strong> {{ userToDelete.email }}<br>
+          <strong>Họ tên:</strong> {{ userToDelete.fullName }}
+        </div>
+        <p class="text-muted">Hành động này không thể hoàn tác!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-2"></i>Hủy
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          <i class="bi bi-trash me-2"></i>Xóa
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

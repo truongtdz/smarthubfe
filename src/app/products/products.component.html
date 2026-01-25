@@ -1,0 +1,235 @@
+<div class="container-fluid py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="bi bi-phone-fill me-2"></i>Quản lý sản phẩm
+      </h4>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Search + Add -->
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              class="form-control"
+              placeholder="Tìm theo tên, mô tả, categoryId..."
+              [(ngModel)]="searchKeyword"
+              (keyup.enter)="search()">
+            <button class="btn btn-primary" (click)="search()">Tìm</button>
+          </div>
+        </div>
+
+        <div class="col-md-4 text-end">
+          <button class="btn btn-success" (click)="openAddModal()">
+            <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-primary">
+          <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Ảnh</th>
+            <th>Danh mục</th>
+            <th>RAM</th>
+            <th>Pin</th>
+            <th>Bộ nhớ</th>
+            <th class="text-center">Thao tác</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr *ngFor="let p of products">
+            <td>{{p.id}}</td>
+            <td>
+              <img *ngIf="p.imageUrl"
+                   [src]="p.imageUrl"
+                   alt="{{p.name}}"
+                   class="img-thumbnail"
+                   style="width: 50px; height: 50px; object-fit: cover;">
+              <span *ngIf="!p.imageUrl" class="text-muted">
+                <i class="bi bi-image"></i>
+              </span>
+            </td>
+            <td>{{p.name}}</td>
+            <td>{{p.categoryId}}</td>
+            <td>{{p.ram}} GB</td>
+            <td>{{p.battery}} mAh</td>
+            <td>{{p.storage}} GB</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-info me-2" (click)="openEditModal(p)">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="openDeleteModal(p)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="products.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              Không có sản phẩm
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal fade" id="productModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          {{ isEditMode ? 'Sửa sản phẩm' : 'Thêm sản phẩm' }}
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Tên sản phẩm *</label>
+            <input class="form-control" [(ngModel)]="currentProduct.name" name="name">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Danh mục *</label>
+            <select class="form-select"
+                    [(ngModel)]="currentProduct.categoryId"
+                    name="categoryId">
+              <option [ngValue]="0">-- Chọn danh mục --</option>
+              <option *ngFor="let c of categories" [ngValue]="c.id">
+                {{ c.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label fw-bold">Ảnh sản phẩm</label>
+
+            <div class="mb-3">
+              <input type="file"
+                     class="form-control"
+                     accept="image/*"
+                     (change)="onFileSelected($event)"
+                     #fileInput>
+              <small class="text-muted">Chấp nhận: JPG, PNG, GIF. Tối đa 5MB</small>
+            </div>
+
+            <!-- Preview ảnh -->
+            <div *ngIf="previewUrl" class="position-relative d-inline-block">
+              <img [src]="previewUrl"
+                   alt="Preview"
+                   class="img-thumbnail"
+                   style="max-width: 200px; max-height: 200px; object-fit: cover;">
+              <button type="button"
+                      class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                      (click)="removeImage(); fileInput.value=''">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+
+            <!-- Hiển thị trạng thái upload -->
+            <div *ngIf="isUploading" class="mt-2">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Đang upload...</span>
+              </div>
+              <span class="ms-2">Đang upload ảnh...</span>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Kích thước màn</label>
+            <input class="form-control" [(ngModel)]="currentProduct.screenSize" name="screenSize">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Loại màn hình</label>
+            <input class="form-control" [(ngModel)]="currentProduct.screenType" name="screenType">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">RAM (GB)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.ram" name="ram">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Pin (mAh)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.battery" name="battery">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Bộ nhớ (GB)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.storage" name="storage">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Chipset</label>
+            <input class="form-control" [(ngModel)]="currentProduct.chipset" name="chipset">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Mô tả</label>
+            <textarea rows="3"
+                      class="form-control"
+                      [(ngModel)]="currentProduct.description"
+                      name="description"></textarea>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-primary"
+                (click)="save()"
+                [disabled]="isUploading">
+          <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Xác nhận xóa</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p>Bạn chắc chắn muốn xóa sản phẩm này?</p>
+        <strong>{{ productToDelete?.name }}</strong>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Xóa</button>
+      </div>
+
+    </div>
+  </div>
+</div>
