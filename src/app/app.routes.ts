@@ -7,13 +7,15 @@ import {ProductsComponent} from './products/products.component';
 import {OrdersComponent} from './orders/orders.component';
 import {CategoriesComponent} from './category/categories.component';
 import {InventoriesComponent} from './inventories/inventories.component';
+import {AuthGuard} from './auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  { path: 'auth', component: AuthComponent },
-  { path: 'home', component: HomeComponent },
+  { path: 'auth', component: AuthComponent},
+  { path: 'home', component: HomeComponent},
   { path: 'admin',
     component: DashboardComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: 'users', component: UsersComponent },
       { path: 'categories', component: CategoriesComponent },

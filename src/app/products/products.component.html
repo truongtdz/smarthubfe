@@ -155,34 +155,39 @@
             </div>
           </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Kích thước màn</label>
-            <input class="form-control" [(ngModel)]="currentProduct.screenSize" name="screenSize">
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Loại màn hình</label>
-            <input class="form-control" [(ngModel)]="currentProduct.screenType" name="screenType">
+          <div class="col-md-4">
+            <label class="form-label">Giá gốc</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.originalPrice" (ngModelChange)="calculatorPrice()" name="originalPrice">
           </div>
 
           <div class="col-md-4">
+            <label class="form-label">Giảm giá</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.discount" (ngModelChange)="calculatorPrice()" name="discount">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Giá bán</label>
+            <input type="number" class="form-control" disabled [(ngModel)]="currentProduct.price" name="price">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Kích thước màn</label>
+            <input type="number" class="form-control" [(ngModel)]="currentProduct.screenSize" name="screenSize">
+          </div>
+
+          <div class="col-md-3">
             <label class="form-label">RAM (GB)</label>
             <input type="number" class="form-control" [(ngModel)]="currentProduct.ram" name="ram">
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Pin (mAh)</label>
             <input type="number" class="form-control" [(ngModel)]="currentProduct.battery" name="battery">
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Bộ nhớ (GB)</label>
             <input type="number" class="form-control" [(ngModel)]="currentProduct.storage" name="storage">
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Chipset</label>
-            <input class="form-control" [(ngModel)]="currentProduct.chipset" name="chipset">
           </div>
 
           <div class="col-md-12">

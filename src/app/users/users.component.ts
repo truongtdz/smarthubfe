@@ -76,10 +76,7 @@ export class UsersComponent implements OnInit {
     this.isEditMode = false;
     this.currentUserId = undefined;
     this.currentUser = {
-      email: '',
-      password: '',
-      fullName: '',
-      role: 'USER'
+      email: '', password: '', fullName: '', role: 'USER'
     };
     this.openModal('userModal');
   }

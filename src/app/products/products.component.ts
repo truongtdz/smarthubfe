@@ -187,14 +187,23 @@ export class ProductsComponent implements OnInit {
 
     this.isUploading = true;
     try {
-      const imageUrl = await this.productService.upload(this.selectedFile).toPromise();
-      this.toast.success('Upload ảnh thành công');
-      return imageUrl;
+      return await this.productService.upload(this.selectedFile).toPromise();
     } catch (err) {
       this.toast.error('Upload ảnh thất bại');
       return undefined;
     } finally {
       this.isUploading = false;
+    }
+  }
+
+  calculatorPrice(): void {
+    this.currentProduct.price =
+      (this.currentProduct?.originalPrice ?? 0) - (this.currentProduct?.discount ?? 0);
+
+    if (this.currentProduct.price < 0) {
+      this.toast.error('Giảm giá không được lớn hơn giá gốc');
+      this.currentProduct.price = 0;
+      this.currentProduct.discount = 0;
     }
   }
 }

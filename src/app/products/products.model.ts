@@ -4,11 +4,12 @@ export interface Product {
   categoryId: number;
   description?: string;
   screenSize?: string;
-  screenType?: string;
   ram?: number;
   battery?: number;
-  chipset?: string;
   storage?: number;
   imageUrl?: string;
   stock?: number;
+  originalPrice?: number;
+  price?: number;
+  discount?: number;
 }
