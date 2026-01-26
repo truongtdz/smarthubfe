@@ -1,5 +1,115 @@
-<app-sidebar></app-sidebar>
-
 <div class="main-content">
-  <router-outlet></router-outlet>
+  <div class="stats-section" *ngIf="showStats">
+    <div class="stats-header">
+      <h2><i class="bi bi-graph-up"></i>Thống kê tổng quan</h2>
+      <div class="stats-actions">
+        <button class="btn btn-sm btn-primary" (click)="loadStatistics()">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="toggleStats()">
+          <i class="bi bi-eye-slash"></i>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <div *ngIf="!isLoading && statistics" class="stats-content">
+      <div class="summary-cards">
+        <div class="stat-card revenue">
+          <div class="card-icon">
+            <i class="bi bi-currency-dollar"></i>
+          </div>
+          <div class="card-content">
+            <h3>{{ formatPrice(statistics.revenueStats.totalRevenue) }}</h3>
+            <p>Tổng doanh thu</p>
+          </div>
+        </div>
+
+        <div class="stat-card today">
+          <div class="card-icon">
+            <i class="bi bi-calendar-day"></i>
+          </div>
+          <div class="card-content">
+            <h3>{{ formatPrice(statistics.revenueStats.todayRevenue) }}</h3>
+            <p>Doanh thu hôm nay</p>
+          </div>
+        </div>
+
+        <div class="stat-card month">
+          <div class="card-icon">
+            <i class="bi bi-calendar3"></i>
+          </div>
+          <div class="card-content">
+            <h3>{{ formatPrice(statistics.revenueStats.monthRevenue) }}</h3>
+            <p>Doanh thu tháng này</p>
+            <span class="growth" [class.positive]="statistics.revenueStats.growth > 0"
+                  [class.negative]="statistics.revenueStats.growth < 0">
+              <i class="bi" [class.bi-arrow-up]="statistics.revenueStats.growth > 0"
+                 [class.bi-arrow-down]="statistics.revenueStats.growth < 0"></i>
+              {{ statistics.revenueStats.growth.toFixed(1) }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card orders">
+          <div class="card-icon">
+            <i class="bi bi-bag-check"></i>
+          </div>
+          <div class="card-content">
+            <h3>{{ statistics.orderStats.totalOrders }}</h3>
+            <p>Tổng đơn hàng</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card full">
+          <h4><i class="bi bi-graph-up"></i>Doanh thu theo tháng</h4>
+          <div class="chart-wrapper">
+            <canvas #lineChart></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card full">
+          <h4><i class="bi bi-bar-chart"></i>Top 5 sản phẩm bán chạy</h4>
+          <div class="chart-wrapper">
+            <canvas #barChart></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <h4><i class="bi bi-trophy"></i>Sản phẩm bán chạy nhất</h4>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Tên sản phẩm</th>
+              <th class="text-end">Số lượng bán</th>
+              <th class="text-end">Doanh thu</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let product of statistics.topProducts; let i = index">
+              <td><span class="badge bg-light text-dark">{{ i + 1 }}</span></td>
+              <td>{{ product.productName }}</td>
+              <td class="text-end"><strong>{{ product.totalSold }}</strong></td>
+              <td class="text-end text-primary"><strong>{{ formatPrice(product.revenue) }}</strong></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!showStats" class="stats-toggle">
+    <button class="btn btn-primary btn-lg" (click)="toggleStats()">
+      <i class="bi bi-eye me-2"></i>Hiển thị thống kê
+    </button>
+  </div>
 </div>

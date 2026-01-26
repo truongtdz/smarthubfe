@@ -1,102 +1,99 @@
-<div class="container-fluid py-4">
-  <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-      <h4 class="mb-0">
-        <i class="bi bi-tags-fill me-2"></i>Quản lý danh mục
-      </h4>
-    </div>
+<div class="page-content">
+  <div class="container-fluid py-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+          <i class="bi bi-tags-fill me-2"></i>Quản lý danh mục
+        </h4>
+      </div>
 
-    <div class="card-body">
+      <div class="card-body">
+        <div class="row mb-4 g-3">
+          <div class="col-md-8">
+            <div class="input-group">
+              <span class="input-group-text bg-light">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Tìm kiếm theo tên hoặc mô tả..."
+                [(ngModel)]="searchKeyword"
+                (keyup.enter)="search()">
+              <button class="btn btn-primary" (click)="search()">
+                <i class="bi bi-search me-1"></i>Tìm kiếm
+              </button>
+            </div>
+          </div>
 
-      <!-- Search + Add -->
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <div class="input-group">
-            <span class="input-group-text bg-primary text-white">
-              <i class="bi bi-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Tìm kiếm theo tên hoặc mô tả..."
-              [(ngModel)]="searchKeyword"
-              (keyup.enter)="search()">
-            <button class="btn btn-primary" (click)="search()">Tìm kiếm</button>
+          <div class="col-md-4 text-md-end">
+            <button class="btn btn-success" (click)="openAddModal()">
+              <i class="bi bi-plus-circle me-2"></i>Thêm danh mục
+            </button>
           </div>
         </div>
 
-        <div class="col-md-4 text-end">
-          <button class="btn btn-success" (click)="openAddModal()">
-            <i class="bi bi-plus-circle me-2"></i>Thêm danh mục
-          </button>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+              <th style="width: 80px;">ID</th>
+              <th>Tên danh mục</th>
+              <th>Mô tả</th>
+              <th class="text-center" style="width: 140px;">Thao tác</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let category of categories">
+              <td class="text-muted">{{ category.id }}</td>
+              <td><strong>{{ category.name }}</strong></td>
+              <td class="text-muted">{{ category.description }}</td>
+              <td class="text-center">
+                <button
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="openEditModal(category)"
+                  title="Chỉnh sửa">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="openDeleteModal(category)"
+                  title="Xóa">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="categories.length === 0">
+              <td colspan="4" class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">Không có danh mục nào</p>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-hover table-striped align-middle">
-          <thead class="table-primary">
-          <tr>
-            <th>ID</th>
-            <th>Tên danh mục</th>
-            <th>Mô tả</th>
-            <th class="text-center">Thao tác</th>
-          </tr>
-          </thead>
-
-          <tbody>
-          <tr *ngFor="let category of categories">
-            <td>{{ category.id }}</td>
-            <td>{{ category.name }}</td>
-            <td>{{ category.description }}</td>
-            <td class="text-center">
-              <button
-                class="btn btn-sm btn-info me-2"
-                (click)="openEditModal(category)">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button
-                class="btn btn-sm btn-danger"
-                (click)="openDeleteModal(category)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
-
-          <tr *ngIf="categories.length === 0">
-            <td colspan="4" class="text-center text-muted py-4">
-              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-              Không có danh mục
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
     </div>
-  </div>
-</div>
-
-<!-- ADD / EDIT MODAL -->
-<div class="modal fade" id="categoryModal" tabindex="-1">
+  </div><div class="modal fade" id="categoryModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-
-      <div class="modal-header bg-primary text-white">
+      <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi me-2"
              [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
           {{ isEditMode ? 'Sửa danh mục' : 'Thêm danh mục' }}
         </h5>
         <button type="button"
-                class="btn-close btn-close-white"
+                class="btn-close"
                 data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label class="form-label fw-bold">
+            <label class="form-label">
               Tên danh mục <span class="text-danger">*</span>
             </label>
             <input
@@ -108,14 +105,14 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-bold">Mô tả</label>
+            <label class="form-label">Mô tả</label>
             <textarea
               rows="3"
               class="form-control"
               [(ngModel)]="currentCategory.description"
               name="description"
               placeholder="Nhập mô tả (không bắt buộc)">
-            </textarea>
+              </textarea>
           </div>
         </form>
       </div>
@@ -123,66 +120,65 @@
       <div class="modal-footer">
         <button
           type="button"
-          class="btn btn-secondary"
+          class="btn btn-light"
           data-bs-dismiss="modal">
-          <i class="bi bi-x-circle me-2"></i>Hủy
+          Hủy
         </button>
 
         <button
           type="button"
           class="btn btn-primary"
           (click)="save()">
-          <i class="bi bi-check-circle me-2"></i>
+          <i class="bi bi-check-circle me-1"></i>
           {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
         </button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa
-        </h5>
-        <button type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body text-center">
-        <i class="bi bi-trash fs-1 text-danger mb-3 d-block"></i>
-        <p class="fs-5">Bạn chắc chắn muốn xóa danh mục này?</p>
-
-        <div class="alert alert-warning" *ngIf="categoryToDelete">
-          <strong>Tên:</strong> {{ categoryToDelete.name }}<br>
-          <strong>Mô tả:</strong> {{ categoryToDelete.description }}
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title text-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa
+          </h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"></button>
         </div>
 
-        <p class="text-muted">Hành động này không thể hoàn tác</p>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <i class="bi bi-trash fs-1 text-danger opacity-75"></i>
+          </div>
+          <p class="fs-5 mb-3">Bạn chắc chắn muốn xóa danh mục này?</p>
+
+          <div class="alert alert-light border text-start" *ngIf="categoryToDelete">
+            <p class="mb-1"><strong>Tên:</strong> {{ categoryToDelete.name }}</p>
+            <p class="mb-0"><strong>Mô tả:</strong> {{ categoryToDelete.description }}</p>
+          </div>
+
+          <p class="text-muted small mb-0">Hành động này không thể hoàn tác</p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-light"
+            data-bs-dismiss="modal">
+            Hủy
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="confirmDelete()">
+            <i class="bi bi-trash me-1"></i>Xóa
+          </button>
+        </div>
       </div>
-
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal">
-          <i class="bi bi-x-circle me-2"></i>Hủy
-        </button>
-
-        <button
-          type="button"
-          class="btn btn-danger"
-          (click)="confirmDelete()">
-          <i class="bi bi-trash me-2"></i>Xóa
-        </button>
-      </div>
-
     </div>
   </div>
 </div>

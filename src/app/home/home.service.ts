@@ -9,11 +9,14 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface OrderReq {
+export interface Order {
+  id?: number;
   userId: number
   phone: string;
   address: string;
-  carts: CartItem[];
+  orderItems: CartItem[];
+  createdAt?: string | undefined;
+  totalAmount: number;
 }
 
 @Injectable({
@@ -73,7 +76,15 @@ export class HomeService {
     );
   }
 
-  createOrder(order: OrderReq): Observable<void> {
-    return this.http.post<void>('http://localhost:8080/api/orders/upload', order);
+  createOrder(order: Order): Observable<void> {
+    return this.http.post<void>('http://localhost:8080/api/orders', order);
+  }
+
+  getUserOrders(userId: number): Observable<Order[]> {
+    return this.http.get<Order[]>(`http://localhost:8080/api/orders/user/${userId}`);
+  }
+
+  getOrderDetail(orderId: number): Observable<Order> {
+    return this.http.get<Order>(`http://localhost:8080/api/orders/${orderId}`);
   }
 }

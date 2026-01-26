@@ -1,24 +1,24 @@
-<div class="container mt-5">
-  <div class="card p-4 mx-auto shadow" style="max-width:420px">
-    <h4 class="text-primary text-center mb-3">
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h4 class="auth-title">
       {{ isLogin ? 'Đăng nhập' : 'Đăng ký' }}
     </h4>
 
-    <div *ngIf="!isLogin" class="mb-2">
+    <div *ngIf="!isLogin" class="form-group">
       <input
         class="form-control"
         placeholder="Họ và tên"
         [(ngModel)]="fullName">
     </div>
 
-    <div class="mb-2">
+    <div class="form-group">
       <input
         class="form-control"
         placeholder="Email"
         [(ngModel)]="email">
     </div>
 
-    <div class="mb-3">
+    <div class="form-group">
       <input
         type="password"
         class="form-control"
@@ -26,11 +26,11 @@
         [(ngModel)]="password">
     </div>
 
-    <button class="btn btn-primary w-100 mb-2" (click)="submit()">
+    <button class="btn-submit" (click)="submit()">
       {{ isLogin ? 'Đăng nhập' : 'Đăng ký' }}
     </button>
 
-    <button class="btn btn-link w-100" (click)="switchMode()">
+    <button class="btn-switch" (click)="switchMode()">
       {{ isLogin ? 'Chưa có tài khoản? Đăng ký' : 'Đã có tài khoản? Đăng nhập' }}
     </button>
   </div>
