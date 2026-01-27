@@ -1,7 +1,6 @@
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="home">
+    <a class="navbar-brand" routerLink="home">
       <i class="bi bi-phone me-2"></i>SmartHub
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -10,291 +9,271 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link active" routerLink="home"><i class="bi bi-house-door me-1"></i>Trang chủ</a>
+          <a class="nav-link" routerLink="home"><i class="bi bi-house-door me-1"></i>Trang chủ</a>
         </li>
         <li class="nav-item" *ngIf="currentUser">
           <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
             <i class="bi bi-cart3 me-1"></i>Giỏ hàng
-            <span class="position-absolute translate-middle badge rounded-pill bg-danger"
-                  *ngIf="cartItemCount > 0">
+            <span class="cart-badge" *ngIf="cartItemCount > 0">
               {{ cartItemCount }}
             </span>
           </a>
-
         </li>
         <li class="nav-item" *ngIf="currentUser">
-          <div class="nav-link"><i class="bi bi-person-circle me-1"></i>{{ currentUser.fullName }}</div>
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#orderHistoryModal"
+             (click)="openOrderHistory()">
+            <i class="bi bi-clock-history me-1"></i>Lịch sử
+          </a>
         </li>
         <li class="nav-item" *ngIf="currentUser">
-          <button class="nav-link" (click)="logout()"><i class="bi bi-box-arrow-right me-1"></i>Đăng xuất</button>
-        </li>
+          <div class="nav-link user-info">
+            <i class="bi bi-person-circle me-1"></i>{{ currentUser.fullName }}
+          </div>
+        </li><li class="nav-item" *ngIf="currentUser">
+        <button class="nav-link btn-logout" (click)="logout()">
+          <i class="bi bi-box-arrow-right me-1"></i>Đăng xuất
+        </button>
+      </li>
         <li class="nav-item" *ngIf="!currentUser">
-          <a class="nav-link" routerLink="auth"><i class="bi bi-box-arrow-right me-1"></i>Đăng nhập</a>
+          <a class="nav-link" routerLink="auth"><i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- Hero Banner -->
-<div class="hero-banner bg-primary text-white py-5">
+<div class="hero-section">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
-        <h1 class="display-4 fw-bold mb-3">Chào mừng đến SmartHub</h1>
-        <p class="lead mb-4">Khám phá những chiếc điện thoại thông minh mới nhất với giá ưu đãi nhất!</p>
-        <a href="/home/#products" class="btn btn-light btn-lg">
+        <h1 class="hero-title">Chào mừng đến SmartHub</h1>
+        <p class="hero-subtitle">Khám phá những chiếc điện thoại thông minh mới nhất với giá ưu đãi nhất!</p>
+        <a href="/home/#products" class="btn btn-hero">
           <i class="bi bi-arrow-down-circle me-2"></i>Xem sản phẩm
         </a>
       </div>
       <div class="col-lg-6 text-center">
-        <i class="bi bi-phone display-1"></i>
+        <i class="bi bi-phone hero-icon"></i>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Search Bar -->
-<div class="container my-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="input-group input-group-lg shadow-sm">
-        <span class="input-group-text bg-white">
-          <i class="bi bi-search text-primary"></i>
-        </span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Tìm kiếm điện thoại..."
-          (input)="searchProducts($event)">
-      </div>
+<div class="search-section">
+  <div class="container">
+    <div class="search-wrapper">
+      <span class="search-icon">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Tìm kiếm điện thoại..."
+        (input)="searchProducts($event)">
     </div>
   </div>
 </div>
 
-<!-- Categories -->
-<div class="container my-4">
-  <h3 class="mb-3 text-primary fw-bold">
+<div class="container category-section">
+  <h3 class="section-title">
     <i class="bi bi-grid-3x3-gap me-2"></i>Danh mục sản phẩm
   </h3>
-  <div class="d-flex flex-wrap gap-2">
+  <div class="category-list">
     <button
-      class="btn"
-      [class.btn-primary]="selectedCategoryId === null"
-      [class.btn-outline-primary]="selectedCategoryId !== null"
+      class="category-btn"
+      [class.active]="selectedCategoryId === null"
       (click)="filterByCategory(null)">
       <i class="bi bi-grid me-1"></i>Tất cả
     </button>
     <button
       *ngFor="let category of categories"
-      class="btn"
-      [class.btn-primary]="selectedCategoryId === category.id"
-      [class.btn-outline-primary]="selectedCategoryId !== category.id"
+      class="category-btn"
+      [class.active]="selectedCategoryId === category.id"
       (click)="filterByCategory(category.id!)">
       <i class="bi bi-tag me-1"></i>{{ category.name }}
     </button>
   </div>
 </div>
 
-<!-- Products Grid -->
-<div class="container my-5" id="products">
-  <h3 class="mb-4 text-primary fw-bold">
+<div class="container product-section" id="products">
+  <h3 class="section-title">
     <i class="bi bi-lightning-charge me-2"></i>Sản phẩm nổi bật
   </h3>
 
-  <div class="row g-4" *ngIf="filteredProducts.length > 0">
-    <div class="col-lg-3 col-md-4 col-sm-6" *ngFor="let product of filteredProducts">
-      <div class="card h-100 shadow-sm product-card border-0">
-
-        <div class="position-relative">
-          <span class="badge bg-danger position-absolute top-0 end-0 m-2 px-3 py-2">
+  <div class="products-grid" *ngIf="filteredProducts.length > 0">
+    <div class="product-item" *ngFor="let product of filteredProducts">
+      <div class="product-card">
+        <div class="product-image-wrapper">
+          <span class="discount-badge" *ngIf="product.discount">
             -{{ formatPrice(product.discount!) }}
           </span>
           <img
             [src]="product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image'"
-            class="card-img-top p-3"
-            style="height: 250px; object-fit: contain;">
+            class="product-image">
         </div>
 
-        <div class="card-body d-flex flex-column">
-
-          <!-- Category + Name cùng hàng -->
-          <div class="product-header mb-2">
-            <span class="badge bg-primary">
+        <div class="product-body">
+          <div class="product-meta">
+            <span class="product-category">
               {{ getCategoryName(product.categoryId) }}
             </span>
-            <h5 class="text-truncate" [title]="product.name">
+            <h5 class="product-name" [title]="product.name">
               {{ product.name }}
             </h5>
           </div>
 
-          <!-- Price -->
-          <div class="mb-3">
-            <div class="text-decoration-line-through text-muted small">
+          <div class="product-price">
+            <div class="original-price">
               {{ formatPrice(product.originalPrice!) }}
             </div>
-            <div class="h4 text-danger fw-bold">
+            <div class="current-price">
               {{ formatPrice(product.price!) }}
             </div>
           </div>
 
-          <!-- Action -->
-          <div class="d-grid gap-2">
-            <button class="btn btn-primary" [disabled]="product.stock === 0" (click)="addToCart(product)">
+          <div class="product-actions">
+            <button class="btn-add-cart" [disabled]="product.stock === 0" (click)="addToCart(product)">
               Thêm vào giỏ
             </button>
             <button
-              class="btn btn-outline-primary"
+              class="btn-view-detail"
               data-bs-toggle="modal"
               data-bs-target="#productDetailModal"
               (click)="openProductDetail(product)">
               Xem chi tiết
             </button>
           </div>
-
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Footer -->
-<footer class="bg-primary text-white mt-5 py-4">
+<footer class="footer">
   <div class="container">
     <div class="row">
-      <div class="col-md-4 mb-3">
-        <h5><i class="bi bi-phone me-2"></i>SmartHub</h5>
-        <p class="small">Cửa hàng điện thoại uy tín với giá tốt nhất thị trường</p>
+      <div class="col-md-4 mb-4">
+        <h5 class="footer-title"><i class="bi bi-phone me-2"></i>SmartHub</h5>
+        <p class="footer-text">Cửa hàng điện thoại uy tín với giá tốt nhất thị trường</p>
       </div>
-      <div class="col-md-4 mb-3">
-        <h6>Liên kết nhanh</h6>
-        <ul class="list-unstyled small">
-          <li><a href="#" class="text-white text-decoration-none"><i class="bi bi-chevron-right"></i> Giới thiệu</a></li>
-          <li><a href="#" class="text-white text-decoration-none"><i class="bi bi-chevron-right"></i> Chính sách bảo hành</a></li>
-          <li><a href="#" class="text-white text-decoration-none"><i class="bi bi-chevron-right"></i> Hướng dẫn mua hàng</a></li>
+      <div class="col-md-4 mb-4">
+        <h6 class="footer-heading">Liên kết nhanh</h6>
+        <ul class="footer-links">
+          <li><a href="#"><i class="bi bi-chevron-right"></i> Giới thiệu</a></li>
+          <li><a href="#"><i class="bi bi-chevron-right"></i> Chính sách bảo hành</a></li>
+          <li><a href="#"><i class="bi bi-chevron-right"></i> Hướng dẫn mua hàng</a></li>
         </ul>
       </div>
-      <div class="col-md-4 mb-3">
-        <h6>Liên hệ</h6>
-        <p class="small mb-1"><i class="bi bi-geo-alt me-2"></i>Hà Nội, Việt Nam</p>
-        <p class="small mb-1"><i class="bi bi-telephone me-2"></i>1900-xxxx</p>
-        <p class="small mb-1"><i class="bi bi-envelope me-2"></i>{{ 'info@smarthub.vn' }}</p>
+      <div class="col-md-4 mb-4">
+        <h6 class="footer-heading">Liên hệ</h6>
+        <p class="footer-contact"><i class="bi bi-geo-alt me-2"></i>Hà Nội, Việt Nam</p>
+        <p class="footer-contact"><i class="bi bi-telephone me-2"></i>1900-xxxx</p>
+        <p class="footer-contact"><i class="bi bi-envelope me-2"></i>info&#64;smarthub.vn</p>
       </div>
     </div>
-    <hr class="bg-white">
-    <div class="text-center small">
-      <p class="mb-0">&copy; 2024 SmartHub. All rights reserved.</p>
+    <hr class="footer-divider">
+    <div class="footer-copyright">
+      <p>&copy; 2024 SmartHub. All rights reserved.</p>
     </div>
   </div>
 </footer>
 
-<!-- ================= MODAL CHI TIẾT ================= -->
 <div class="modal fade" id="productDetailModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content" *ngIf="selectedProduct">
-
       <div class="modal-header">
-        <h5 class="modal-title">
-          {{ selectedProduct.name }}
-        </h5>
+        <h5 class="modal-title">{{ selectedProduct.name }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
         <div class="row">
-          <!-- Image -->
           <div class="col-md-5 text-center">
-            <img
-              [src]="selectedProduct.imageUrl"
-              class="img-fluid mb-3"
-              style="max-height: 300px; object-fit: contain;">
+            <img [src]="selectedProduct.imageUrl" class="product-detail-image">
           </div>
-
-          <!-- Info -->
           <div class="col-md-7">
-            <span class="badge bg-primary mb-2">
+            <span class="badge bg-primary mb-3">
               {{ getCategoryName(selectedProduct.categoryId) }}
             </span>
-
-            <p class="text-muted">
-              {{ selectedProduct.description }}
-            </p>
-
-            <ul class="list-group list-group-flush small">
-              <li class="list-group-item">Màn hình: {{ selectedProduct.screenType }}</li>
-              <li class="list-group-item">RAM: {{ selectedProduct.ram }}</li>
-              <li class="list-group-item">Lưu trữ: {{ selectedProduct.storage }}</li>
-              <li class="list-group-item">Chip: {{ selectedProduct.chipset }}</li>
-              <li class="list-group-item">Pin: {{ selectedProduct.battery }}</li>
-            </ul>
-
-            <div class="mt-3">
-              <div class="text-decoration-line-through text-muted">
+            <p class="text-muted mb-3">{{ selectedProduct.description }}</p>
+            <div class="product-specs">
+              <div class="spec-item">
+                <span class="spec-label">Màn hình:</span>
+                <span class="spec-value">{{ selectedProduct.screenType }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">RAM:</span>
+                <span class="spec-value">{{ selectedProduct.ram }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Lưu trữ:</span>
+                <span class="spec-value">{{ selectedProduct.storage }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Chip:</span>
+                <span class="spec-value">{{ selectedProduct.chipset }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Pin:</span>
+                <span class="spec-value">{{ selectedProduct.battery }}</span>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="text-decoration-line-through text-muted mb-1">
                 {{ formatPrice(selectedProduct.originalPrice!) }}
               </div>
               <div class="h4 text-danger fw-bold">
                 {{ formatPrice(selectedProduct.price!) }}
               </div>
             </div>
-
           </div>
         </div>
       </div>
-
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
         <button class="btn btn-primary" [disabled]="selectedProduct.stock === 0" (click)="addToCart(selectedProduct)">
           Thêm vào giỏ
         </button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL GIỎ HÀNG ================= -->
 <div class="modal fade" id="cartModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-cart3 me-2"></i>Giỏ hàng của bạn
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
-        <div *ngIf="cartItems.length === 0" class="text-center py-5">
-          <i class="bi bi-cart-x display-1 text-muted"></i>
-          <p class="mt-3 text-muted">Giỏ hàng trống</p>
+        <div *ngIf="cartItems.length === 0" class="empty-state">
+          <i class="bi bi-cart-x"></i>
+          <p>Giỏ hàng trống</p>
         </div>
-
         <div *ngIf="cartItems.length > 0">
-          <div class="list-group">
-            <div class="list-group-item" *ngFor="let item of cartItems">
+          <div class="cart-items">
+            <div class="cart-item" *ngFor="let item of cartItems">
               <div class="row align-items-center">
                 <div class="col-md-2">
-                  <img [src]="item.product.imageUrl" class="img-fluid" style="max-height: 80px; object-fit: contain;">
+                  <img [src]="item.product.imageUrl" class="cart-item-image">
                 </div>
                 <div class="col-md-4">
-                  <h6 class="mb-1">{{ item.product.name }}</h6>
+                  <h6 class="cart-item-name">{{ item.product.name }}</h6>
                   <small class="text-muted">{{ formatPrice(item.product.price!) }}</small>
                 </div>
                 <div class="col-md-3">
-                  <div class="input-group input-group-sm">
-                    <button class="btn btn-outline-secondary" type="button"
+                  <div class="quantity-control">
+                    <button class="qty-btn" type="button"
                             (click)="updateCartQuantity(item.product.id!, $event)"
                             [attr.data-quantity]="item.quantity - 1">
                       <i class="bi bi-dash"></i>
                     </button>
-                    <input type="number" class="form-control text-center"
+                    <input type="number" class="qty-input"
                            [value]="item.quantity" min="1"
-                           (change)="updateCartQuantity(item.product.id!, $event)"
-                           style="max-width: 60px;">
-                    <button class="btn btn-outline-secondary" type="button"
+                           (change)="updateCartQuantity(item.product.id!, $event)">
+                    <button class="qty-btn" type="button"
                             (click)="updateCartQuantity(item.product.id!, $event)"
                             [attr.data-quantity]="item.quantity + 1">
                       <i class="bi bi-plus"></i>
@@ -305,7 +284,7 @@
                   <strong class="text-danger">{{ formatPrice(item.product.price! * item.quantity) }}</strong>
                 </div>
                 <div class="col-md-1 text-end">
-                  <button class="btn btn-sm btn-outline-danger"
+                  <button class="btn-remove"
                           data-bs-toggle="modal"
                           data-bs-target="#confirmDeleteModal"
                           (click)="confirmRemoveItem(item.product.id!)">
@@ -315,8 +294,7 @@
               </div>
             </div>
           </div>
-
-          <div class="mt-3 pt-3 border-top">
+          <div class="cart-summary">
             <div class="d-flex justify-content-between align-items-center">
               <h5>Tổng cộng:</h5>
               <h4 class="text-danger fw-bold">{{ formatPrice(getCartTotal()) }}</h4>
@@ -324,23 +302,18 @@
           </div>
         </div>
       </div>
-
       <div class="modal-footer" *ngIf="cartItems.length > 0">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-          Tiếp tục mua hàng
-        </button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục mua hàng</button>
         <button class="btn btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#confirmCheckoutModal">
           <i class="bi bi-credit-card me-2"></i>Thanh toán
         </button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL XÁC NHẬN XÓA ================= -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -361,7 +334,6 @@
   </div>
 </div>
 
-<!-- ================= MODAL XÁC NHẬN THANH TOÁN ================= -->
 <div class="modal fade" id="confirmCheckoutModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -371,14 +343,11 @@
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
-        <!-- Thông tin giao hàng -->
-        <div class="mb-3">
+        <div class="mb-4">
           <h6 class="fw-bold mb-3">
             <i class="bi bi-truck me-2"></i>Thông tin giao hàng
           </h6>
-
           <div class="mb-3">
             <label for="orderPhone" class="form-label">
               Số điện thoại <span class="text-danger">*</span>
@@ -388,10 +357,8 @@
               class="form-control"
               id="orderPhone"
               [(ngModel)]="orderInfo.phone"
-              placeholder="Nhập số điện thoại nhận hàng"
-              required>
+              placeholder="Nhập số điện thoại nhận hàng">
           </div>
-
           <div class="mb-3">
             <label for="orderAddress" class="form-label">
               Địa chỉ nhận hàng <span class="text-danger">*</span>
@@ -401,24 +368,19 @@
               id="orderAddress"
               [(ngModel)]="orderInfo.address"
               rows="3"
-              placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"
-              required></textarea>
+              placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"></textarea>
           </div>
         </div>
-
         <hr>
-
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h6 class="mb-0">Tổng cộng:</h6>
           <h4 class="text-danger fw-bold mb-0">{{ formatPrice(getCartTotal()) }}</h4>
         </div>
-
         <p class="text-muted small mb-0">
           <i class="bi bi-info-circle me-1"></i>
           Vui lòng kiểm tra kỹ thông tin trước khi xác nhận thanh toán
         </p>
       </div>
-
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           <i class="bi bi-x-circle me-1"></i>Hủy
@@ -430,6 +392,124 @@
           [disabled]="!orderInfo.phone || !orderInfo.address">
           <i class="bi bi-check-circle me-1"></i>Xác nhận đặt hàng
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="orderHistoryModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="isLoadingOrders" class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+        <div *ngIf="!isLoadingOrders && orders.length === 0" class="empty-state">
+          <i class="bi bi-cart-x"></i>
+          <p>Chưa có đơn hàng nào</p>
+        </div>
+        <div class="row g-3" *ngIf="!isLoadingOrders && orders.length > 0">
+          <div class="col-12" *ngFor="let order of orders">
+            <div class="order-card">
+              <div class="row">
+                <div class="col-md-8">
+                  <h6 class="order-id">
+                    <i class="bi bi-receipt me-1"></i>Đơn hàng #{{ order.id }}
+                  </h6>
+                  <p class="order-info">
+                    <i class="bi bi-calendar me-1"></i>{{ formatOrderDate(order.createdAt) }}
+                  </p>
+                  <p class="order-info">
+                    <i class="bi bi-telephone me-1"></i>{{ order.phone }}
+                  </p>
+                  <p class="order-info">
+                    <i class="bi bi-geo-alt me-1"></i>{{ order.address }}
+                  </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                  <p class="mb-2">
+                    <span class="text-muted">Số lượng:</span>
+                    <strong class="ms-2">{{ order.orderItems?.length || 0 }} sản phẩm</strong>
+                  </p>
+                  <h5 class="text-danger fw-bold mb-3">
+                    {{ formatPrice(order.totalAmount) }}
+                  </h5>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#orderDetailModal"
+                    (click)="viewOrderDetail(order)">
+                    <i class="bi bi-eye me-1"></i>Xem chi tiết
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" *ngIf="selectedOrder">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #{{ selectedOrder.id }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-4">
+          <h6 class="fw-bold">Thông tin giao hàng</h6>
+          <p class="mb-1"><strong>SĐT:</strong> {{ selectedOrder.phone }}</p>
+          <p class="mb-1"><strong>Địa chỉ:</strong> {{ selectedOrder.address }}</p>
+          <p class="mb-0"><strong>Ngày đặt:</strong> {{ formatOrderDate(selectedOrder.createdAt) }}</p>
+        </div>
+        <hr>
+        <h6 class="fw-bold mb-3">Sản phẩm đã đặt</h6>
+        <div class="cart-items">
+          <div class="cart-item" *ngFor="let item of selectedOrder.orderItems">
+            <div class="row align-items-center">
+              <div class="col-md-2">
+                <img
+                  [src]="getProductFromMap(item.product.id)?.imageUrl || 'https://via.placeholder.com/80'"
+                  class="cart-item-image">
+              </div>
+              <div class="col-md-5">
+                <h6 class="cart-item-name">{{ item.product.name }}</h6>
+                <small class="text-muted">{{ formatPrice(item.product.price) }}</small>
+              </div>
+              <div class="col-md-2 text-center">
+                <span class="badge bg-secondary">x{{ item.quantity }}</span>
+              </div>
+              <div class="col-md-3 text-end">
+                <strong class="text-danger">
+                  {{ formatPrice((item.product.price || 0) * item.quantity) }}
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cart-summary">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5>Tổng cộng:</h5>
+            <h4 class="text-danger fw-bold">{{ formatPrice(selectedOrder.totalAmount) }}</h4>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
       </div>
     </div>
   </div>

@@ -7,7 +7,7 @@ import {CategoriesService} from '../category/categories.service';
 import {RouterLink} from '@angular/router';
 import {User} from '../users/users.model';
 import {AuthService} from '../auth/auth.service';
-import {CartItem, HomeService, OrderReq} from './home.service';
+import {CartItem, HomeService, Order} from './home.service';
 import {ToastrService} from 'ngx-toastr';
 import {FormsModule} from '@angular/forms';
 
@@ -20,7 +20,7 @@ import {FormsModule} from '@angular/forms';
 })
 export class HomeComponent implements OnInit {
   categories: Category[] = [];
-  products: Product[] = [];
+  products: Map<number, Product> = new Map();
   filteredProducts: Product[] = [];
   selectedCategoryId: number | null = null;
   searchKeyword: string = '';
@@ -33,8 +33,15 @@ export class HomeComponent implements OnInit {
   cartItemCount: number = 0;
   itemToDelete: number | null = null;
 
-  initOrderInfo(): OrderReq {return {userId: 0, phone: '', address: '', carts: []}}
-  orderInfo: OrderReq = this.initOrderInfo();
+  orders: Order[] = [];
+  selectedOrder: Order | null = null;
+  isLoadingOrders = false;
+
+  initOrderInfo(): Order {
+    return {userId: 0, phone: '', address: '', orderItems: [], createdAt: '', totalAmount: 0};
+  }
+
+  orderInfo: Order = this.initOrderInfo();
 
   constructor(
     private productsService: ProductsService,
@@ -76,8 +83,8 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     this.productsService.getAll().subscribe({
       next: (data) => {
-        this.products = data;
-        this.filteredProducts = this.products;
+        data.forEach(p => this.products.set(p.id!, p));
+        this.filteredProducts = data;
         this.isLoading = false;
       },
       error: (error) => {
@@ -100,7 +107,7 @@ export class HomeComponent implements OnInit {
       this.isLoading = true;
       this.productsService.search(this.searchKeyword).subscribe({
         next: (data) => {
-          this.products = data;
+          data.forEach(p => this.products.set(p.id!, p));
           this.applyFilters();
           this.isLoading = false;
         },
@@ -115,12 +122,16 @@ export class HomeComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredProducts = this.products.filter(product => {
+    const productsArray = Array.from(this.products.values());
+    this.filteredProducts = productsArray.filter(product => {
       return !this.selectedCategoryId || product.categoryId === this.selectedCategoryId;
     });
   }
 
-  formatPrice(price: number): string {
+  formatPrice(price: number | undefined): string {
+    if (price === undefined) {
+      return '0 ₫';
+    }
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -184,9 +195,9 @@ export class HomeComponent implements OnInit {
     }
 
     this.orderInfo.userId = this.currentUser?.id || 0;
-    this.orderInfo.carts = this.cartItems;
+    this.orderInfo.orderItems = this.cartItems;
 
-    this.homeService.createOrder(this.orderInfo).subscribe(() =>{
+    this.homeService.createOrder(this.orderInfo).subscribe(() => {
       this.toast.success('Đặt hàng thành công!');
       this.homeService.clearCart();
       this.resetOrderInfo();
@@ -210,10 +221,47 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    // Xóa backdrop
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
     document.body.classList.remove('modal-open');
     document.body.style.removeProperty('overflow');
     document.body.style.removeProperty('padding-right');
+  }
+
+  openOrderHistory(): void {
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.isLoadingOrders = true;
+    const userId = this.currentUser?.id;
+    if (userId) {
+      this.homeService.getUserOrders(userId).subscribe({
+        next: (data) => {
+          this.orders = data;
+          this.isLoadingOrders = false;
+        },
+        error: () => {
+          this.isLoadingOrders = false;
+        }
+      });
+    }
+  }
+
+  getProductFromMap(productId: number | undefined): Product | undefined {
+    if (productId === undefined) {
+      return undefined;
+    }
+    return this.products.get(productId);
+  }
+
+  viewOrderDetail(order: Order): void {
+    this.selectedOrder = order;
+  }
+
+  formatOrderDate(dateStr: string | undefined): string {
+    if (!dateStr) {
+      return '';
+    }
+    return new Date(dateStr).toLocaleString('vi-VN');
   }
 }
