@@ -4,7 +4,7 @@ import {Category} from '../category/category.model';
 import {Product} from '../products/products.model';
 import {ProductsService} from '../products/products.service';
 import {CategoriesService} from '../category/categories.service';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {User} from '../users/users.model';
 import {AuthService} from '../auth/auth.service';
 import {CartItem, HomeService, Order} from './home.service';
@@ -49,6 +49,7 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private homeService: HomeService,
     private toast: ToastrService,
+    private router: Router
   ) {
     this.authService.user$.subscribe(user => {
       this.currentUser = user;
@@ -149,6 +150,8 @@ export class HomeComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/auth'])
+      .then(item => this.toast.success('Đăng xuất thành công!'));
   }
 
   addToCart(product: Product): void {
@@ -190,7 +193,14 @@ export class HomeComponent implements OnInit {
 
   checkout(): void {
     if (!this.orderInfo.phone || !this.orderInfo.address) {
-      alert('Vui lòng nhập đầy đủ thông tin giao hàng!');
+      this.toast.error('Vui lòng nhập đầy đủ thông tin giao hàng!');
+      return;
+    }
+
+    const phoneRegex = /^(0|\+84)[0-9]{9}$/;
+
+    if (!phoneRegex.test(this.orderInfo.phone)) {
+      this.toast.error('Số điện thoại không hợp lệ!');
       return;
     }
 

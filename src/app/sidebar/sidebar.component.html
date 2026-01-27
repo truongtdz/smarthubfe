@@ -13,7 +13,7 @@
 
   <ul class="nav nav-pills flex-column mb-auto gap-1">
     <li class="nav-item">
-      <a routerLink="/admin" routerLinkActive="active" class="nav-link text-white">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link text-white">
         Trang quản trị
       </a>
     </li>
@@ -51,7 +51,7 @@
 
   <hr class="text-white">
 
-  <div class="small text-white-50">
-    Admin Panel
-  </div>
+  <button (click)="logout()" class="btn btn-danger">
+    Đăng xuất
+  </button>
 </div>

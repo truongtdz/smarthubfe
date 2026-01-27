@@ -31,6 +31,9 @@ export class AuthComponent {
   }
 
   submit() {
+    if (!this.validateEmailAndPassword(this.email, this.password)) {
+      return;
+    }
     if (this.isLogin) {
       this.authService.login({
         email: this.email,
@@ -38,8 +41,14 @@ export class AuthComponent {
       }).subscribe({
         next: res => {
           this.authService.saveUser(res);
-          this.router.navigate(['/home'])
-            .then(item => this.toast.success('Đăng nhập thành công!'));
+          if ('USER' === res.role) {
+            this.router.navigate(['/home'])
+              .then(item => this.toast.success('Đăng nhập thành công!'));
+          }
+          if ('ADMIN' === res.role) {
+            this.router.navigate(['/admin/users'])
+              .then(item => this.toast.success('Đăng nhập thành công!'));
+          }
         },
         error: err => this.toast.error(err.error || 'Đăng nhập thất bại!')
       });
@@ -52,8 +61,26 @@ export class AuthComponent {
         next: () => {
           this.isLogin = true;
         },
-        error: err => this.toast.error(err.error || 'Đăng nhập thất bại!')
+        error: err => this.toast.error(err.error || 'Đăng ký thất bại!')
       });
     }
+  }
+
+  private validateEmailAndPassword(email?: string, password?: string): boolean {
+    if (!this.email || !this.password) {
+      this.toast.error('Email và mật khẩu không được để trống');
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+      this.toast.error('Email không đúng định dạng');
+      return false;
+    }
+
+    if (this.password.length < 6) {
+      this.toast.error('Mật khẩu tối thiểu 6 ký tự');
+      return false;
+    }
+    return true;
   }
 }
