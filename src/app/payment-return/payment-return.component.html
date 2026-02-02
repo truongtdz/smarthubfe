@@ -1,0 +1,68 @@
+<!-- src/app/components/payment-return/payment-return.component.html -->
+<div class="payment-result-container">
+  <div class="payment-result-card">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Đang xử lý kết quả thanh toán...</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="!isLoading && transactionStatus?.status === 'SUCCESS'" class="success-state">
+      <div class="icon-success">✓</div>
+      <h2>Thanh toán thành công!</h2>
+      <p class="message">{{ transactionStatus?.message }}</p>
+
+      <div class="transaction-details">
+        <div class="detail-row">
+          <span class="label">Mã đơn hàng:</span>
+          <span class="value">{{ transactionStatus?.orderId }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Mã giao dịch:</span>
+          <span class="value">{{ transactionStatus?.transactionId }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Số tiền:</span>
+          <span class="value">{{ transactionStatus?.amount | number }} VNĐ</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Ngân hàng:</span>
+          <span class="value">{{ transactionStatus?.bankCode }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Thời gian:</span>
+          <span class="value">{{ transactionStatus?.payDate }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button (click)="goToOrders()" class="btn btn-primary">Xem đơn hàng</button>
+        <button (click)="goToHome()" class="btn btn-secondary">Về trang chủ</button>
+      </div>
+    </div>
+
+    <!-- Failed State -->
+    <div *ngIf="!isLoading && transactionStatus?.status === 'FAILED'" class="failed-state">
+      <div class="icon-failed">✕</div>
+      <h2>Thanh toán thất bại!</h2>
+      <p class="message">{{ transactionStatus?.message }}</p>
+
+      <div class="action-buttons">
+        <button (click)="goToHome()" class="btn btn-primary">Thử lại</button>
+        <button (click)="goToHome()" class="btn btn-secondary">Về trang chủ</button>
+      </div>
+    </div>
+
+    <!-- Invalid State -->
+    <div *ngIf="!isLoading && transactionStatus?.status === 'INVALID'" class="invalid-state">
+      <div class="icon-warning">⚠</div>
+      <h2>Giao dịch không hợp lệ!</h2>
+      <p class="message">{{ transactionStatus?.message }}</p>
+
+      <div class="action-buttons">
+        <button (click)="goToHome()" class="btn btn-primary">Về trang chủ</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<!-- src/app/components/payment/payment.component.html -->
+<div class="payment-container">
+  <div class="payment-card">
+    <h2>Thanh toán VNPay</h2>
+
+    <div class="form-group">
+      <label for="amount">Số tiền (VNĐ):</label>
+      <input
+        type="number"
+        id="amount"
+        [(ngModel)]="amount"
+        class="form-control"
+        placeholder="Nhập số tiền"
+        [disabled]="isLoading">
+    </div>
+
+    <div class="form-group">
+      <label for="orderInfo">Thông tin đơn hàng:</label>
+      <input
+        type="text"
+        id="orderInfo"
+        [(ngModel)]="orderInfo"
+        class="form-control"
+        placeholder="Nhập mô tả đơn hàng"
+        [disabled]="isLoading">
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      (click)="processPayment()"
+      class="btn btn-primary"
+      [disabled]="isLoading">
+      <span *ngIf="!isLoading">Thanh toán</span>
+      <span *ngIf="isLoading">Đang xử lý...</span>
+    </button>
+  </div>
+</div>

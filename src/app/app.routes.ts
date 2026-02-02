@@ -9,12 +9,16 @@ import {CategoriesComponent} from './category/categories.component';
 import {InventoriesComponent} from './inventories/inventories.component';
 import {AuthGuard} from './auth/auth.guard';
 import {AdminPageComponent} from './admin-page/admin-page.component';
+import {PaymentComponent} from './payment/payment.component';
+import { PaymentReturnComponent } from "./payment-return/payment-return.component";
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
   { path: 'auth', component: AuthComponent},
   { path: 'home', component: HomeComponent},
   { path: 'orders', component: OrdersComponent},
+  { path: 'payment', component: PaymentComponent },
+  { path: 'payment/vnpay-return', component: PaymentReturnComponent },
   { path: 'admin',
     component: AdminPageComponent,
     canActivate: [AuthGuard],
