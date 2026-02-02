@@ -1,0 +1,66 @@
+<!-- Chat Button -->
+<div class="chat-button" *ngIf="!isOpen" (click)="toggleChat()">
+  <i class="bi bi-chat-dots-fill"></i>
+</div>
+
+<!-- Chat Box -->
+<div class="chat-container" *ngIf="isOpen">
+  <!-- Header -->
+  <div class="chat-header">
+    <h6 class="mb-0">
+      <i class="bi bi-robot me-2"></i>SmartHub AI
+    </h6>
+    <button type="button" class="btn-close btn-close-white" (click)="toggleChat()"></button>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-messages">
+    <div *ngIf="messages.length === 0" class="text-center text-muted mt-3">
+      <i class="bi bi-chat-square-text fs-1"></i>
+      <p class="mt-2">Xin chào! Tôi có thể giúp gì cho bạn?</p>
+      <span class="small text-decoration-underline">
+        Nếu chưa đăng nhập, bạn có thể bị mất tin nhắn cũ
+      </span>
+    </div>
+
+    <div *ngFor="let msg of messages"
+         class="message"
+         [ngClass]="{'message-user': msg.isUser, 'message-ai': !msg.isUser}">
+      <div class="message-bubble">
+        {{ msg.content }}
+      </div>
+      <small class="message-time">
+        {{ msg.timestamp | date:'HH:mm' }}
+      </small>
+    </div>
+
+    <div *ngIf="isLoading" class="message message-ai">
+      <div class="message-bubble">
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="ms-2">Đang suy nghĩ...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nhập tin nhắn..."
+        [(ngModel)]="userInput"
+        (keyup.enter)="sendMessage()"
+        [disabled]="isLoading">
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="sendMessage()"
+        [disabled]="!userInput.trim() || isLoading">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </div>
+  </div>
+</div>

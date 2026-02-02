@@ -10,11 +10,12 @@ import {AuthService} from '../auth/auth.service';
 import {CartItem, HomeService, Order} from './home.service';
 import {ToastrService} from 'ngx-toastr';
 import {FormsModule} from '@angular/forms';
+import {ChatBoxComponent} from '../chat-box/chat-box.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ChatBoxComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
