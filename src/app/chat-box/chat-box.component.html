@@ -8,7 +8,7 @@
   <!-- Header -->
   <div class="chat-header">
     <h6 class="mb-0">
-      <i class="bi bi-robot me-2"></i>SmartHub AI
+      <i class="bi bi-robot me-2"></i>SmartHub AI - Chuyên gia tư vấn sản phẩm
     </h6>
     <button type="button" class="btn-close btn-close-white" (click)="toggleChat()"></button>
   </div>
@@ -29,6 +29,13 @@
       <div class="message-bubble">
         {{ msg.content }}
       </div>
+      <!-- Nút chỉ hiện với AI -->
+      <button
+        *ngIf="!msg.isUser"
+        class="btn btn-link btn-sm p-0"
+        (click)="onViewDetail(msg)">
+        Xem chi tiết
+      </button>
       <small class="message-time">
         {{ msg.timestamp | date:'HH:mm' }}
       </small>

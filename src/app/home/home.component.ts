@@ -11,6 +11,8 @@ import {CartItem, HomeService, Order} from './home.service';
 import {ToastrService} from 'ngx-toastr';
 import {FormsModule} from '@angular/forms';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
+import {PaymentService} from '../payment/payment.service';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +25,7 @@ export class HomeComponent implements OnInit {
   categories: Category[] = [];
   products: Map<number, Product> = new Map();
   filteredProducts: Product[] = [];
+  allProducts: Product[] = [];
   selectedCategoryId: number | null = null;
   searchKeyword: string = '';
   isLoading: boolean = false;
@@ -39,7 +42,7 @@ export class HomeComponent implements OnInit {
   isLoadingOrders = false;
 
   initOrderInfo(): Order {
-    return {userId: 0, phone: '', address: '', orderItems: [], createdAt: '', totalAmount: 0};
+    return {userId: 0, phone: '', address: '', orderItems: [], createdAt: '', totalAmount: 0, status: 0};
   }
 
   orderInfo: Order = this.initOrderInfo();
@@ -50,7 +53,8 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private homeService: HomeService,
     private toast: ToastrService,
-    private router: Router
+    private router: Router,
+    private paymentService: PaymentService
   ) {
     this.authService.user$.subscribe(user => {
       this.currentUser = user;
@@ -87,6 +91,7 @@ export class HomeComponent implements OnInit {
       next: (data) => {
         data.forEach(p => this.products.set(p.id!, p));
         this.filteredProducts = data;
+        this.allProducts = data;
         this.isLoading = false;
       },
       error: (error) => {
@@ -147,6 +152,11 @@ export class HomeComponent implements OnInit {
 
   openProductDetail(product: any): void {
     this.selectedProduct = product;
+
+    const modalEl = document.getElementById('productDetailModal');
+    if (modalEl) {
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
   }
 
   logout(): void {
@@ -207,6 +217,7 @@ export class HomeComponent implements OnInit {
 
     this.orderInfo.userId = this.currentUser?.id || 0;
     this.orderInfo.orderItems = this.cartItems;
+    this.orderInfo.status = 0;
 
     this.homeService.createOrder(this.orderInfo).subscribe(() => {
       this.toast.success('Đặt hàng thành công!');
@@ -275,4 +286,31 @@ export class HomeComponent implements OnInit {
     }
     return new Date(dateStr).toLocaleString('vi-VN');
   }
+
+  processPayment(order: Order): void {
+    const amount = order.totalAmount;
+    const orderId = order.id || 0;
+    this.paymentService.createPayment(amount, orderId)
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.status === 'OK' && response.url) {
+            // Redirect to VNPAY payment page
+            window.location.href = response.url;
+          } else {
+            this.toast.error(response.message || 'Có lỗi xảy ra');
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.toast.error('Không thể kết nối đến server. Vui lòng thử lại.');
+          console.error('Payment error:', error);
+        }
+      });
+  }
+
+  handleViewDetail(product: any) {
+    this.openProductDetail(product);
+  }
+
 }

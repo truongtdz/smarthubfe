@@ -17,6 +17,7 @@ export interface Order {
   orderItems: CartItem[];
   createdAt?: string | undefined;
   totalAmount: number;
+  status: number;
 }
 
 @Injectable({

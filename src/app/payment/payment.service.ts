@@ -27,12 +27,20 @@ export class PaymentService {
 
   constructor(private http: HttpClient) { }
 
-  createPayment(amount: number, orderInfo: string): Observable<PaymentResponse> {
+  createPayment(amount: number, orderId: number): Observable<PaymentResponse> {
     const params = new HttpParams()
       .set('amount', amount.toString())
-      .set('orderInfo', orderInfo);
+      .set('orderId', orderId);
 
     return this.http.post<PaymentResponse>(`${this.apiUrl}/create-payment`, null, { params });
+  }
+
+  updateStatusPayment(orderId: string, status: number): Observable<void> {
+    const params = new HttpParams()
+      .set('orderId', orderId)
+      .set('status', status);
+
+    return this.http.post<void>(`http://localhost:8080/api/orders/update-status`, null, { params });
   }
 
   getTransactionStatus(queryParams: any): Observable<TransactionStatus> {

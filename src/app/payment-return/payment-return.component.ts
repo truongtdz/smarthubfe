@@ -41,24 +41,32 @@ export class PaymentReturnComponent implements OnInit {
           this.transactionStatus = status;
           this.isLoading = false;
 
-          // Có thể lưu kết quả vào database hoặc update order status ở đây
           if (status.status === 'SUCCESS') {
-            // TODO: Cập nhật trạng thái đơn hàng
-            console.log('Payment successful:', status);
+            this.paymentService.updateStatusPayment(status.orderId, 1).subscribe({
+              next: (response) => {
+                console.log('Cập nhật trạng thái thành công', response);
+              },
+              error: (err) => {
+                console.error('Lỗi khi cập nhật trạng thái', err);
+              }
+            });
           }
         },
         error: (error) => {
           this.isLoading = false;
-          console.error('Error checking transaction:', error);
+          this.paymentService.updateStatusPayment(error.orderId, 0).subscribe({
+            next: (response) => {
+              console.log('Cập nhật trạng thái thành công', response);
+            },
+            error: (err) => {
+              console.error('Lỗi khi cập nhật trạng thái', err);
+            }
+          });
         }
       });
   }
 
   goToHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  goToOrders(): void {
-    this.router.navigate(['/orders']);
+    this.router.navigate(['/home']);
   }
 }

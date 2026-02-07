@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {Message} from './chat-box.model';
 import {ChatService} from './chat-box.service';
 import {AuthService} from '../auth/auth.service';
 import {User} from '../users/users.model';
 import {FormsModule} from '@angular/forms';
 import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {ProductsService} from '../products/products.service';
+import {Product} from '../products/products.model';
 
 @Component({
   selector: 'app-chat-box',
@@ -25,9 +27,12 @@ export class ChatBoxComponent {
   isLoading = false;
   currentUser: User | null = null;
 
+  @Output() viewDetail = new EventEmitter<Product>();
+
   constructor(
     private authService: AuthService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private productService: ProductsService,
   ) {
     this.authService.user$.subscribe(user => {
       this.currentUser = user;
@@ -43,6 +48,7 @@ export class ChatBoxComponent {
 
     // Add user message
     const userMessage: Message = {
+      id: 0,
       content: this.userInput,
       isUser: true,
       timestamp: new Date()
@@ -56,18 +62,29 @@ export class ChatBoxComponent {
     // Call API
     this.chatService.sendMessage({userId: this.currentUser?.id, message: messageText}).subscribe({
       next: (response) => {
-        const aiMessage: Message = {
-          content: response.response,
-          isUser: false,
-          timestamp: new Date()
-        };
-        this.messages.push(aiMessage);
-        this.isLoading = false;
-        this.scrollToBottom();
+        const listProductRecommend: number[] =
+          response.response.split(',').map(id => Number(id));
+
+        listProductRecommend.forEach(item => {
+          this.productService.getById(item).subscribe({
+            next: (response: Product) => {
+              const aiMessage: Message = {
+                id: response.id!,
+                content: response.name,
+                isUser: false,
+                timestamp: new Date()
+              };
+              this.messages.push(aiMessage);
+              this.isLoading = false;
+              this.scrollToBottom();
+            }
+          })
+        })
       },
       error: (error) => {
         console.error('Error:', error);
         const errorMessage: Message = {
+          id: 0,
           content: 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.',
           isUser: false,
           timestamp: new Date()
@@ -85,5 +102,13 @@ export class ChatBoxComponent {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
     }, 100);
+  }
+
+  onViewDetail(message: Message) {
+    this.productService.getById(Number(message.content)).subscribe({
+      next: (response: Product) => {
+        this.viewDetail.emit(response);
+      }
+    })
   }
 }

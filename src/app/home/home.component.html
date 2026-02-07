@@ -440,6 +440,13 @@
                   <h5 class="text-danger fw-bold mb-3">
                     {{ formatPrice(order.totalAmount) }}
                   </h5>
+                  <button *ngIf="order.status === 0"
+                    class="btn btn-success btn-sm mr-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#orderDetailModal"
+                    (click)="processPayment(order)">
+                    <i class="bi bi-credit-card me-2"></i>Thanh toán online
+                  </button>
                   <button
                     class="btn btn-primary btn-sm"
                     data-bs-toggle="modal"
@@ -515,4 +522,6 @@
   </div>
 </div>
 
-<app-chat-box></app-chat-box>
+<app-chat-box
+  (viewDetail)="handleViewDetail($event)">
+</app-chat-box>

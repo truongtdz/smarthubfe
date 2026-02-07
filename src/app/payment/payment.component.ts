@@ -48,22 +48,22 @@ export class PaymentComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.paymentService.createPayment(this.amount, this.orderInfo)
-      .subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (response.status === 'OK' && response.url) {
-            // Redirect to VNPAY payment page
-            window.location.href = response.url;
-          } else {
-            this.errorMessage = response.message || 'Có lỗi xảy ra';
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = 'Không thể kết nối đến server. Vui lòng thử lại.';
-          console.error('Payment error:', error);
-        }
-      });
+    // this.paymentService.createPayment(this.amount, this.orderInfo)
+    //   .subscribe({
+    //     next: (response) => {
+    //       this.isLoading = false;
+    //       if (response.status === 'OK' && response.url) {
+    //         // Redirect to VNPAY payment page
+    //         window.location.href = response.url;
+    //       } else {
+    //         this.errorMessage = response.message || 'Có lỗi xảy ra';
+    //       }
+    //     },
+    //     error: (error) => {
+    //       this.isLoading = false;
+    //       this.errorMessage = 'Không thể kết nối đến server. Vui lòng thử lại.';
+    //       console.error('Payment error:', error);
+    //     }
+    //   });
   }
 }
