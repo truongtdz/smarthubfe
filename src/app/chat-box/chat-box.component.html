@@ -17,7 +17,7 @@
   <div class="chat-messages">
     <div *ngIf="messages.length === 0" class="text-center text-muted mt-3">
       <i class="bi bi-chat-square-text fs-1"></i>
-      <p class="mt-2">Xin chào! Tôi có thể giúp gì cho bạn?</p>
+      <p class="mt-2">Xin chào! Bạn cần mua điện thoại như nào.</p>
       <span class="small text-decoration-underline">
         Nếu chưa đăng nhập, bạn có thể bị mất tin nhắn cũ
       </span>
@@ -27,15 +27,19 @@
          class="message"
          [ngClass]="{'message-user': msg.isUser, 'message-ai': !msg.isUser}">
       <div class="message-bubble">
-        {{ msg.content }}
+        <span class="message-text">
+          {{ msg.content }}
+        </span>
+
+        <!-- Nút chỉ hiện với AI -->
+        <button
+          *ngIf="!msg.isUser"
+          class="btn btn-link btn-sm p-0 ms-2 btn-view-inline"
+          (click)="onViewDetail(msg)">
+          Xem chi tiết
+        </button>
       </div>
-      <!-- Nút chỉ hiện với AI -->
-      <button
-        *ngIf="!msg.isUser"
-        class="btn btn-link btn-sm p-0"
-        (click)="onViewDetail(msg)">
-        Xem chi tiết
-      </button>
+
       <small class="message-time">
         {{ msg.timestamp | date:'HH:mm' }}
       </small>

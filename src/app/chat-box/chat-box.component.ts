@@ -105,7 +105,7 @@ export class ChatBoxComponent {
   }
 
   onViewDetail(message: Message) {
-    this.productService.getById(Number(message.content)).subscribe({
+    this.productService.getById(Number(message.id)).subscribe({
       next: (response: Product) => {
         this.viewDetail.emit(response);
       }

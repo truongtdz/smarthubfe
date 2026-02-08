@@ -48,7 +48,10 @@
       <div class="col-lg-6">
         <h1 class="hero-title">Chào mừng đến SmartHub</h1>
         <p class="hero-subtitle">Khám phá những chiếc điện thoại thông minh mới nhất với giá ưu đãi nhất!</p>
-        <a href="/home/#products" class="btn btn-hero">
+        <a
+          class="btn btn-hero"
+          [routerLink]="['/home']"
+          fragment="products">
           <i class="bi bi-arrow-down-circle me-2"></i>Xem sản phẩm
         </a>
       </div>
@@ -304,9 +307,7 @@
       </div>
       <div class="modal-footer" *ngIf="cartItems.length > 0">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục mua hàng</button>
-        <button class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#confirmCheckoutModal">
+        <button class="btn btn-primary" (click)="openConfirmCheckout()">
           <i class="bi bi-credit-card me-2"></i>Thanh toán
         </button>
       </div>
@@ -382,7 +383,10 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelCheckout()">
           <i class="bi bi-x-circle me-1"></i>Hủy
         </button>
         <button
@@ -449,8 +453,6 @@
                   </button>
                   <button
                     class="btn btn-primary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#orderDetailModal"
                     (click)="viewOrderDetail(order)">
                     <i class="bi bi-eye me-1"></i>Xem chi tiết
                   </button>
@@ -469,55 +471,57 @@
 
 <div class="modal fade" id="orderDetailModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content" *ngIf="selectedOrder">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #{{ selectedOrder.id }}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-4">
-          <h6 class="fw-bold">Thông tin giao hàng</h6>
-          <p class="mb-1"><strong>SĐT:</strong> {{ selectedOrder.phone }}</p>
-          <p class="mb-1"><strong>Địa chỉ:</strong> {{ selectedOrder.address }}</p>
-          <p class="mb-0"><strong>Ngày đặt:</strong> {{ formatOrderDate(selectedOrder.createdAt) }}</p>
+    <div class="modal-content">
+      <ng-container *ngIf="selectedOrder">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #{{ selectedOrder.id }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <hr>
-        <h6 class="fw-bold mb-3">Sản phẩm đã đặt</h6>
-        <div class="cart-items">
-          <div class="cart-item" *ngFor="let item of selectedOrder.orderItems">
-            <div class="row align-items-center">
-              <div class="col-md-2">
-                <img
-                  [src]="getProductFromMap(item.product.id)?.imageUrl || 'https://via.placeholder.com/80'"
-                  class="cart-item-image">
-              </div>
-              <div class="col-md-5">
-                <h6 class="cart-item-name">{{ item.product.name }}</h6>
-                <small class="text-muted">{{ formatPrice(item.product.price) }}</small>
-              </div>
-              <div class="col-md-2 text-center">
-                <span class="badge bg-secondary">x{{ item.quantity }}</span>
-              </div>
-              <div class="col-md-3 text-end">
-                <strong class="text-danger">
-                  {{ formatPrice((item.product.price || 0) * item.quantity) }}
-                </strong>
+        <div class="modal-body">
+          <div class="mb-4">
+            <h6 class="fw-bold">Thông tin giao hàng</h6>
+            <p class="mb-1"><strong>SĐT:</strong> {{ selectedOrder.phone }}</p>
+            <p class="mb-1"><strong>Địa chỉ:</strong> {{ selectedOrder.address }}</p>
+            <p class="mb-0"><strong>Ngày đặt:</strong> {{ formatOrderDate(selectedOrder.createdAt) }}</p>
+          </div>
+          <hr>
+          <h6 class="fw-bold mb-3">Sản phẩm đã đặt</h6>
+          <div class="cart-items">
+            <div class="cart-item" *ngFor="let item of selectedOrder.orderItems">
+              <div class="row align-items-center">
+                <div class="col-md-2">
+                  <img
+                    [src]="getProductFromMap(item.product.id)?.imageUrl || 'https://via.placeholder.com/80'"
+                    class="cart-item-image">
+                </div>
+                <div class="col-md-5">
+                  <h6 class="cart-item-name">{{ item.product.name }}</h6>
+                  <small class="text-muted">{{ formatPrice(item.product.price) }}</small>
+                </div>
+                <div class="col-md-2 text-center">
+                  <span class="badge bg-secondary">x{{ item.quantity }}</span>
+                </div>
+                <div class="col-md-3 text-end">
+                  <strong class="text-danger">
+                    {{ formatPrice((item.product.price || 0) * item.quantity) }}
+                  </strong>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="cart-summary">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5>Tổng cộng:</h5>
-            <h4 class="text-danger fw-bold">{{ formatPrice(selectedOrder.totalAmount) }}</h4>
+          <div class="cart-summary">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5>Tổng cộng:</h5>
+              <h4 class="text-danger fw-bold">{{ formatPrice(selectedOrder.totalAmount) }}</h4>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
+        <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
       </div>
+      </ng-container>
     </div>
   </div>
 </div>

@@ -276,8 +276,13 @@ export class HomeComponent implements OnInit {
     return this.products.get(productId);
   }
 
-  viewOrderDetail(order: Order): void {
+  viewOrderDetail(order: any) {
     this.selectedOrder = order;
+
+    setTimeout(() => {
+      const el = document.getElementById('orderDetailModal');
+      bootstrap.Modal.getOrCreateInstance(el!).show();
+    });
   }
 
   formatOrderDate(dateStr: string | undefined): string {
@@ -311,6 +316,38 @@ export class HomeComponent implements OnInit {
 
   handleViewDetail(product: any) {
     this.openProductDetail(product);
+  }
+
+  closeModal() {
+    document.body.classList.remove('modal-open');
+    document.querySelectorAll('.modal-backdrop')
+      .forEach(e => e.remove());
+  }
+
+  openConfirmCheckout() {
+    const cartModalEl = document.getElementById('cartModal');
+    const checkoutModalEl = document.getElementById('confirmCheckoutModal');
+
+    if (cartModalEl) {
+      bootstrap.Modal.getInstance(cartModalEl)?.hide();
+    }
+
+    setTimeout(() => {
+      if (checkoutModalEl) {
+        new bootstrap.Modal(checkoutModalEl).show();
+      }
+    }, 200);
+  }
+
+  cancelCheckout() {
+    const checkoutEl = document.getElementById('confirmCheckoutModal');
+    const cartEl = document.getElementById('cartModal');
+
+    bootstrap.Modal.getInstance(checkoutEl!)?.hide();
+
+    setTimeout(() => {
+      new bootstrap.Modal(cartEl!).show();
+    }, 200);
   }
 
 }

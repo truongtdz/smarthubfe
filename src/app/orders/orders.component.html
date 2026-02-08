@@ -44,9 +44,22 @@
                 <span class="text-muted">Số lượng:</span>
                 <strong class="ms-2">{{ order.orderItems.length }} sản phẩm</strong>
               </p>
-              <h5 class="text-danger fw-bold mb-3">
-                {{ formatPrice(order.totalAmount) }}
-              </h5>
+              <div class="d-flex justify-content-end align-items-center gap-2 mb-2">
+                <h5 class="text-danger fw-bold mb-0">
+                  {{ formatPrice(order.totalAmount) }}
+                </h5>
+                <span
+                  *ngIf="order.status === 1"
+                  class="badge bg-success">
+                  Đã thanh toán
+                </span>
+                <span
+                  *ngIf="order.status === 0"
+                  class="badge bg-warning text-dark">
+                  Chưa thanh toán
+                </span>
+              </div>
+
               <button
                 class="btn btn-primary btn-sm"
                 data-bs-toggle="modal"
