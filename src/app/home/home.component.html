@@ -12,16 +12,13 @@
           <a class="nav-link" routerLink="home"><i class="bi bi-house-door me-1"></i>Trang chủ</a>
         </li>
         <li class="nav-item" *ngIf="currentUser">
-          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
+          <a class="nav-link" href="#" (click)="showCartModal = true; $event.preventDefault()">
             <i class="bi bi-cart3 me-1"></i>Giỏ hàng
-            <span class="cart-badge" *ngIf="cartItemCount > 0">
-              {{ cartItemCount }}
-            </span>
+            <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
           </a>
         </li>
         <li class="nav-item" *ngIf="currentUser">
-          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#orderHistoryModal"
-             (click)="openOrderHistory()">
+          <a class="nav-link" href="#" (click)="openOrderHistory(); $event.preventDefault()">
             <i class="bi bi-clock-history me-1"></i>Lịch sử
           </a>
         </li>
@@ -181,12 +178,12 @@
   </div>
 </footer>
 
-<div class="modal fade" id="productDetailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-overlay" *ngIf="showProductDetailModal" (click)="showProductDetailModal = false">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" (click)="$event.stopPropagation()">
     <div class="modal-content" *ngIf="selectedProduct">
       <div class="modal-header">
         <h5 class="modal-title">{{ selectedProduct.name }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" (click)="showProductDetailModal = false"></button>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -232,7 +229,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button class="btn btn-secondary" (click)="showProductDetailModal = false">Đóng</button>
         <button class="btn btn-primary" [disabled]="selectedProduct.stock === 0" (click)="addToCart(selectedProduct)">
           Thêm vào giỏ
         </button>
@@ -241,14 +238,14 @@
   </div>
 </div>
 
-<div class="modal fade" id="cartModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-overlay" *ngIf="showCartModal" (click)="showCartModal = false">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-cart3 me-2"></i>Giỏ hàng của bạn
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" (click)="showCartModal = false"></button>
       </div>
       <div class="modal-body">
         <div *ngIf="cartItems.length === 0" class="empty-state">
@@ -306,7 +303,7 @@
         </div>
       </div>
       <div class="modal-footer" *ngIf="cartItems.length > 0">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Tiếp tục mua hàng</button>
+        <button class="btn btn-secondary" (click)="showCartModal = false">Đóng</button>
         <button class="btn btn-primary" (click)="openConfirmCheckout()">
           <i class="bi bi-credit-card me-2"></i>Thanh toán
         </button>
@@ -315,19 +312,19 @@
   </div>
 </div>
 
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal-overlay" *ngIf="showConfirmDeleteModal" (click)="showConfirmDeleteModal = false">
+  <div class="modal-dialog modal-dialog-cen tered" style="max-width: 40%" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Xác nhận xóa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" (click)="showConfirmDeleteModal = false"></button>
       </div>
       <div class="modal-body">
         <p>Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="removeCartItem()">
+        <button type="button" class="btn btn-secondary" (click)="showConfirmDeleteModal = false">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="removeCartItem()">
           Xóa
         </button>
       </div>
@@ -335,14 +332,14 @@
   </div>
 </div>
 
-<div class="modal fade" id="confirmCheckoutModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal-overlay" *ngIf="showConfirmCheckoutModal" (click)="showConfirmCheckoutModal = false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 40%" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-credit-card me-2"></i>Xác nhận thanh toán
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" (click)="cancelCheckout()"></button>
       </div>
       <div class="modal-body">
         <div class="mb-4">
@@ -390,10 +387,10 @@
           <i class="bi bi-x-circle me-1"></i>Hủy
         </button>
         <button
+          *ngIf="disableCheckout"
           type="button"
           class="btn btn-primary"
-          (click)="checkout()"
-          [disabled]="!orderInfo.phone || !orderInfo.address">
+          (click)="checkout()">
           <i class="bi bi-check-circle me-1"></i>Xác nhận đặt hàng
         </button>
       </div>
@@ -401,14 +398,14 @@
   </div>
 </div>
 
-<div class="modal fade" id="orderHistoryModal" tabindex="-1">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-overlay" *ngIf="showOrderHistoryModal" (click)="showOrderHistoryModal = false">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" (click)="showOrderHistoryModal = false"></button>
       </div>
       <div class="modal-body">
         <div *ngIf="isLoadingOrders" class="text-center py-5">
@@ -463,21 +460,21 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-secondary" (click)="showOrderHistoryModal = false">Đóng</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="orderDetailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-overlay" *ngIf="showOrderDetailModal" (click)="showOrderDetailModal = false">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <ng-container *ngIf="selectedOrder">
         <div class="modal-header">
           <h5 class="modal-title">
             <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #{{ selectedOrder.id }}
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" (click)="showOrderDetailModal = false"></button>
         </div>
         <div class="modal-body">
           <div class="mb-4">
@@ -519,7 +516,7 @@
           </div>
         </div>
         <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-secondary" (click)="showOrderDetailModal = false">Đóng</button>
       </div>
       </ng-container>
     </div>

@@ -5,6 +5,8 @@ import { AuthService } from '../auth/auth.service';
 import { ProductsService } from '../products/products.service';
 import { Product } from '../products/products.model';
 import { RouterLink } from '@angular/router';
+import {PaymentService} from '../payment/payment.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-order-history',
@@ -18,11 +20,15 @@ export class OrdersComponent implements OnInit {
   products: Map<number, Product> = new Map();
   selectedOrder: Order | null = null;
   isLoading = false;
+  showConfirmDeleteModal = false;
+  orderIdConfirm: string = '';
 
   constructor(
     private homeService: HomeService,
     private authService: AuthService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private paymentService: PaymentService,
+    private toastService: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -80,5 +86,23 @@ export class OrdersComponent implements OnInit {
       return '';
     }
     return new Date(dateStr).toLocaleString('vi-VN');
+  }
+
+  viewConfirmOrder(orderId: number): void {
+    this.showConfirmDeleteModal = true;
+    this.orderIdConfirm = orderId.toString();
+  }
+
+  confirmOrder(): void {
+    this.paymentService.confirmOrder(this.orderIdConfirm, 1).subscribe({
+      next: (response) => {
+        this.toastService.success('Cập nhật trạng thái thành công');
+        this.showConfirmDeleteModal = false;
+        this.loadOrders();
+      },
+      error: (err) => {
+        this.toastService.success('Lỗi khi cập nhật trạng thái');
+      }
+    });
   }
 }

@@ -62,24 +62,35 @@ export class ChatBoxComponent {
     // Call API
     this.chatService.sendMessage({userId: this.currentUser?.id, message: messageText}).subscribe({
       next: (response) => {
-        const listProductRecommend: number[] =
-          response.response.split(',').map(id => Number(id));
+        if (response.response === 'Hiện tại không có sản phẩm nào phù hợp.'){
+          const aiMessage: Message = {
+            content: response.response,
+            isUser: false,
+            timestamp: new Date()
+          };
+          this.messages.push(aiMessage);
+          this.isLoading = false;
+          this.scrollToBottom();
+        } else {
+          const listProductRecommend: number[] =
+            response.response.split(',').map(id => Number(id));
 
-        listProductRecommend.forEach(item => {
-          this.productService.getById(item).subscribe({
-            next: (response: Product) => {
-              const aiMessage: Message = {
-                id: response.id!,
-                content: response.name,
-                isUser: false,
-                timestamp: new Date()
-              };
-              this.messages.push(aiMessage);
-              this.isLoading = false;
-              this.scrollToBottom();
-            }
+          listProductRecommend.forEach(item => {
+            this.productService.getById(item).subscribe({
+              next: (response: Product) => {
+                const aiMessage: Message = {
+                  id: response.id!,
+                  content: response.name,
+                  isUser: false,
+                  timestamp: new Date()
+                };
+                this.messages.push(aiMessage);
+                this.isLoading = false;
+                this.scrollToBottom();
+              }
+            })
           })
-        })
+        }
       },
       error: (error) => {
         console.error('Error:', error);
@@ -111,4 +122,6 @@ export class ChatBoxComponent {
       }
     })
   }
+
+  protected readonly isNaN = isNaN;
 }

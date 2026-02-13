@@ -43,6 +43,14 @@ export class PaymentService {
     return this.http.post<void>(`http://localhost:8080/api/orders/update-status`, null, { params });
   }
 
+  confirmOrder(orderId: string, confirm: number): Observable<void> {
+    const params = new HttpParams()
+      .set('orderId', orderId)
+      .set('confirm', confirm);
+
+    return this.http.post<void>(`http://localhost:8080/api/orders/confirm`, null, { params });
+  }
+
   getTransactionStatus(queryParams: any): Observable<TransactionStatus> {
     return this.http.get<TransactionStatus>(`${this.apiUrl}/vnpay-return`, { params: queryParams });
   }

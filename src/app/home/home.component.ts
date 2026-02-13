@@ -41,8 +41,17 @@ export class HomeComponent implements OnInit {
   selectedOrder: Order | null = null;
   isLoadingOrders = false;
 
+  showProductDetailModal = false;
+  showCartModal = false;
+  showConfirmDeleteModal = false;
+  showConfirmCheckoutModal = false;
+  showOrderHistoryModal = false;
+  showOrderDetailModal = false;
+
+  disableCheckout = true;
+
   initOrderInfo(): Order {
-    return {userId: 0, phone: '', address: '', orderItems: [], createdAt: '', totalAmount: 0, status: 0};
+    return {userId: 0, phone: '', address: '', orderItems: [], createdAt: '', totalAmount: 0, status: 0, isConfirm: 0};
   }
 
   orderInfo: Order = this.initOrderInfo();
@@ -71,7 +80,8 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
-    this.loadProducts();
+    this.loadProducts()
+    this.disableCheckout = true;
   }
 
   loadCategories(): void {
@@ -150,23 +160,10 @@ export class HomeComponent implements OnInit {
     return category ? category.name : 'Unknown';
   }
 
-  openProductDetail(product: any): void {
-    this.selectedProduct = product;
-
-    const modalEl = document.getElementById('productDetailModal');
-    if (modalEl) {
-      bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    }
-  }
-
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth'])
       .then(item => this.toast.success('Đăng xuất thành công!'));
-  }
-
-  addToCart(product: Product): void {
-    this.homeService.addToCart(product);
   }
 
   updateCartQuantity(productId: number, event: Event): void {
@@ -184,17 +181,6 @@ export class HomeComponent implements OnInit {
       if (quantity > 0) {
         this.homeService.updateQuantity(productId, quantity);
       }
-    }
-  }
-
-  confirmRemoveItem(productId: number): void {
-    this.itemToDelete = productId;
-  }
-
-  removeCartItem(): void {
-    if (this.itemToDelete !== null) {
-      this.homeService.removeFromCart(this.itemToDelete);
-      this.itemToDelete = null;
     }
   }
 
@@ -219,38 +205,18 @@ export class HomeComponent implements OnInit {
     this.orderInfo.orderItems = this.cartItems;
     this.orderInfo.status = 0;
 
+    this.disableCheckout = false;
     this.homeService.createOrder(this.orderInfo).subscribe(() => {
       this.toast.success('Đặt hàng thành công!');
       this.homeService.clearCart();
       this.resetOrderInfo();
       this.closeAllModals();
+      this.showConfirmCheckoutModal = false;
     });
   }
 
   resetOrderInfo(): void {
     this.orderInfo = this.initOrderInfo();
-  }
-
-  closeAllModals(): void {
-    const modals = ['cartModal', 'confirmCheckoutModal'];
-    modals.forEach(modalId => {
-      const modalElement = document.getElementById(modalId);
-      if (modalElement) {
-        const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    });
-
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-    document.body.classList.remove('modal-open');
-    document.body.style.removeProperty('overflow');
-    document.body.style.removeProperty('padding-right');
-  }
-
-  openOrderHistory(): void {
-    this.loadOrders();
   }
 
   loadOrders(): void {
@@ -276,15 +242,6 @@ export class HomeComponent implements OnInit {
     return this.products.get(productId);
   }
 
-  viewOrderDetail(order: any) {
-    this.selectedOrder = order;
-
-    setTimeout(() => {
-      const el = document.getElementById('orderDetailModal');
-      bootstrap.Modal.getOrCreateInstance(el!).show();
-    });
-  }
-
   formatOrderDate(dateStr: string | undefined): string {
     if (!dateStr) {
       return '';
@@ -300,7 +257,6 @@ export class HomeComponent implements OnInit {
         next: (response) => {
           this.isLoading = false;
           if (response.status === 'OK' && response.url) {
-            // Redirect to VNPAY payment page
             window.location.href = response.url;
           } else {
             this.toast.error(response.message || 'Có lỗi xảy ra');
@@ -314,40 +270,58 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  handleViewDetail(product: any) {
-    this.openProductDetail(product);
+  openProductDetail(product: any): void {
+    this.selectedProduct = product;
+    this.showProductDetailModal = true;
   }
 
-  closeModal() {
-    document.body.classList.remove('modal-open');
-    document.querySelectorAll('.modal-backdrop')
-      .forEach(e => e.remove());
+  addToCart(product: Product): void {
+    this.homeService.addToCart(product);
+    this.showProductDetailModal = false;
   }
 
-  openConfirmCheckout() {
-    const cartModalEl = document.getElementById('cartModal');
-    const checkoutModalEl = document.getElementById('confirmCheckoutModal');
+  openOrderHistory(): void {
+    this.loadOrders();
+    this.showOrderHistoryModal = true;
+  }
 
-    if (cartModalEl) {
-      bootstrap.Modal.getInstance(cartModalEl)?.hide();
+  viewOrderDetail(order: any): void {
+    this.selectedOrder = order;
+    this.showOrderDetailModal = true;
+  }
+
+  openConfirmCheckout(): void {
+    this.showCartModal = false;
+    this.showConfirmCheckoutModal = true;
+    this.disableCheckout = true;
+  }
+
+  cancelCheckout(): void {
+    this.showConfirmCheckoutModal = false;
+    this.showCartModal = true;
+  }
+
+  closeAllModals(): void {
+    this.showCartModal = false;
+    this.showConfirmCheckoutModal = false;
+  }
+
+  confirmRemoveItem(productId: number): void {
+    this.itemToDelete = productId;
+    this.showConfirmDeleteModal = true;
+  }
+
+  removeCartItem(): void {
+    if (this.itemToDelete !== null) {
+      this.homeService.removeFromCart(this.itemToDelete);
+      this.itemToDelete = null;
     }
-
-    setTimeout(() => {
-      if (checkoutModalEl) {
-        new bootstrap.Modal(checkoutModalEl).show();
-      }
-    }, 200);
+    this.showConfirmDeleteModal = false;
   }
 
-  cancelCheckout() {
-    const checkoutEl = document.getElementById('confirmCheckoutModal');
-    const cartEl = document.getElementById('cartModal');
-
-    bootstrap.Modal.getInstance(checkoutEl!)?.hide();
-
-    setTimeout(() => {
-      new bootstrap.Modal(cartEl!).show();
-    }, 200);
+  handleViewDetail(product: any): void {
+    this.selectedProduct = product;
+    this.showProductDetailModal = true;
   }
 
 }

@@ -1,5 +1,5 @@
 export interface Message {
-  id: number;
+  id?: number;
   content: string;
   isUser: boolean;
   timestamp: Date;

@@ -33,7 +33,7 @@
 
         <!-- Nút chỉ hiện với AI -->
         <button
-          *ngIf="!msg.isUser"
+          *ngIf="!msg.isUser && msg.id != null && !isNaN(msg.id)"
           class="btn btn-link btn-sm p-0 ms-2 btn-view-inline"
           (click)="onViewDetail(msg)">
           Xem chi tiết

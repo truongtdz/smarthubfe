@@ -67,6 +67,19 @@
                 (click)="viewOrderDetail(order)">
                 <i class="bi bi-eye me-1"></i>Xem chi tiết
               </button>
+              <button
+                *ngIf="order.isConfirm !== 1"
+                class="btn btn-primary btn-sm"
+                (click)="viewConfirmOrder(order.id!)">
+                <i class="bi bi-eye me-1"></i>Xác nhận đơn hàng
+              </button>
+              <button
+                *ngIf="order.isConfirm === 1"
+                [disabled]="order.isConfirm === 1"
+                class="btn btn-primary btn-sm"
+                (click)="viewConfirmOrder(order.id!)">
+                <i class="bi bi-eye me-1"></i>Đã xác nhận
+              </button>
             </div>
           </div>
         </div>
@@ -137,4 +150,23 @@
     </div>
   </div>
 </div>
+</div>
+<div class="modal-overlay" *ngIf="showConfirmDeleteModal" (click)="showConfirmDeleteModal = false">
+  <div class="modal-dialog modal-dialog-cen tered" style="max-width: 40%" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận đơn hàng</h5>
+        <button type="button" class="btn-close" (click)="showConfirmDeleteModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn xác nhận đơn hàng?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showConfirmDeleteModal = false">Hủy</button>
+        <button type="button" class="btn btn-success" (click)="confirmOrder()">
+          Xác nhận
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

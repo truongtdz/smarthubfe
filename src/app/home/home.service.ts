@@ -18,6 +18,7 @@ export interface Order {
   createdAt?: string | undefined;
   totalAmount: number;
   status: number;
+  isConfirm: number;
 }
 
 @Injectable({
